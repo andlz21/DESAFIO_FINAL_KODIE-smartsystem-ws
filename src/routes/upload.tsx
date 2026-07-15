@@ -254,6 +254,42 @@ function UploadPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-success" />
+              Análise concluída com sucesso
+            </DialogTitle>
+            <DialogDescription>
+              O desenho <b>{file?.name}</b> foi processado e a planilha foi atualizada.
+              Confira os indicadores atualizados no Dashboard ou revise as peças necessárias.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSuccess(false);
+                navigate({ to: "/pecas" });
+              }}
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Ver peças
+            </Button>
+            <Button
+              onClick={() => {
+                setShowSuccess(false);
+                navigate({ to: "/" });
+              }}
+            >
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              Ir para o Dashboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
