@@ -63,25 +63,41 @@ function UploadPage() {
 
   const submit = async () => {
     if (!file || state === "uploading" || state === "processing") return;
+    if (file.type !== "application/pdf") {
+      toast.error("Apenas arquivos application/pdf são aceitos.");
+      return;
+    }
     setError(null);
     setProgress(0);
     setState("uploading");
+
+    console.log("[upload] enviando PDF ao webhook:", {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    });
+
     try {
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("File", file, file.name);
       if (jobId) fd.append("jobId", jobId);
 
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("POST", WEBHOOK);
+        // Não definir Content-Type manualmente — o browser gera multipart/form-data com boundary.
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
         };
         xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error(`HTTP ${xhr.status}`));
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            const body = xhr.responseText || xhr.statusText || "sem corpo de resposta";
+            reject(new Error(`Webhook respondeu HTTP ${xhr.status}: ${body}`));
+          }
         };
-        xhr.onerror = () => reject(new Error("Falha de rede"));
+        xhr.onerror = () => reject(new Error("Falha de rede ao contatar o webhook"));
         xhr.send(fd);
       });
 
