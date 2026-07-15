@@ -80,7 +80,30 @@ const STATUS_COLOR: Record<string, string> = {
 function PedidosPage() {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["dashboard"], queryFn: () => getDashboardData() });
-  const baseOrders = useMemo(() => (data ? applyOverrides(data.orders) : []), [data]);
+  const baseOrders = useMemo(() => {
+    if (!data) return [] as Order[];
+    const existing = applyOverrides(data.orders);
+    // Auto-gerar rascunhos "Solicitado" para peças faltantes que ainda não têm pedido.
+    const key = (jobId: string, partId: string) => `${jobId}::${partId}`;
+    const covered = new Set(existing.map((o) => key(o.jobId, o.partId)));
+    const drafts: Order[] = data.necessaryParts
+      .filter((p) => p.missingQuantity > 0 && !covered.has(key(p.jobId, p.partId)))
+      .map((p) => ({
+        orderId: `DRAFT-${p.jobId}-${p.partId}`,
+        jobId: p.jobId,
+        partId: p.partId,
+        description: p.description,
+        missingQuantity: p.missingQuantity,
+        origin: "A definir",
+        orderStatus: "Solicitado",
+        orderDate: "",
+        expectedDeliveryDate: "",
+        supplier: "",
+        responsible: "",
+        notes: "Rascunho gerado automaticamente a partir de peça faltante",
+      }));
+    return [...drafts, ...existing];
+  }, [data]);
 
   const [jobF, setJobF] = useState("");
   const [partF, setPartF] = useState("");
