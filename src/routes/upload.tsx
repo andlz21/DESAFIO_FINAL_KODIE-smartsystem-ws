@@ -42,11 +42,13 @@ const WEBHOOK =
 
 function UploadPage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [jobId, setJobId] = useState("");
   const [state, setState] = useState<State>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onFile = (f: File | undefined | null) => {
