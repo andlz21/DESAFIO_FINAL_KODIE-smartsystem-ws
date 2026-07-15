@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -8,7 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { UploadCloud, FileText, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { UploadCloud, FileText, CheckCircle2, Loader2, AlertCircle, LayoutDashboard, Package } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/upload")({
@@ -34,11 +42,13 @@ const WEBHOOK =
 
 function UploadPage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [jobId, setJobId] = useState("");
   const [state, setState] = useState<State>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onFile = (f: File | undefined | null) => {
@@ -106,7 +116,9 @@ function UploadPage() {
       setTimeout(() => {
         setState("done");
         qc.invalidateQueries({ queryKey: ["dashboard"] });
+        qc.refetchQueries({ queryKey: ["dashboard"] });
         toast.success("Reconciliação concluída. Dashboard atualizado.");
+        setShowSuccess(true);
       }, 1800);
     } catch (e) {
       setState("error");
@@ -242,6 +254,42 @@ function UploadPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-success" />
+              Análise concluída com sucesso
+            </DialogTitle>
+            <DialogDescription>
+              O desenho <b>{file?.name}</b> foi processado e a planilha foi atualizada.
+              Confira os indicadores atualizados no Dashboard ou revise as peças necessárias.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSuccess(false);
+                navigate({ to: "/pecas" });
+              }}
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Ver peças
+            </Button>
+            <Button
+              onClick={() => {
+                setShowSuccess(false);
+                navigate({ to: "/" });
+              }}
+            >
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              Ir para o Dashboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
