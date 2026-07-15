@@ -18,20 +18,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Smart Material Reconciliation" },
+      { title: "Dashboard — Smart Material Reconciliation" },
       {
         name: "description",
         content:
           "Análise e reconciliação inteligente de materiais para tubulação industrial a partir de desenhos técnicos.",
       },
-      { property: "og:title", content: "Smart Material Reconciliation" },
+      { property: "og:title", content: "Dashboard — Smart Material Reconciliation" },
       {
         property: "og:description",
         content:
-          "Reconciliação automatizada de Bill of Materials com integração ao Google Sheets via Make.com.",
+          "Análise e reconciliação inteligente de materiais para tubulação industrial a partir de desenhos técnicos.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Dashboard — Smart Material Reconciliation" },
+      { name: "twitter:description", content: "Análise e reconciliação inteligente de materiais para tubulação industrial a partir de desenhos técnicos." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd3c11a7-4df7-4f3d-8b2e-41229a11a4b1/id-preview-a597489c--f9563f33-a5bd-452c-bc1f-f8db3a9c271a.lovable.app-1784151593157.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd3c11a7-4df7-4f3d-8b2e-41229a11a4b1/id-preview-a597489c--f9563f33-a5bd-452c-bc1f-f8db3a9c271a.lovable.app-1784151593157.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
