@@ -116,7 +116,9 @@ function UploadPage() {
       setTimeout(() => {
         setState("done");
         qc.invalidateQueries({ queryKey: ["dashboard"] });
+        qc.refetchQueries({ queryKey: ["dashboard"] });
         toast.success("Reconciliação concluída. Dashboard atualizado.");
+        setShowSuccess(true);
       }, 1800);
     } catch (e) {
       setState("error");
