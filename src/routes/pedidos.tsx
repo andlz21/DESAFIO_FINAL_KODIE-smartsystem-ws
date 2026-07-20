@@ -240,10 +240,22 @@ function PedidosPage() {
                   <TableCell>{o.expectedDeliveryDate || "—"}</TableCell>
                   <TableCell>{o.responsible || "—"}</TableCell>
                   <TableCell>
-                    <Button size="sm" variant="outline" onClick={() => setEditing(o)}>Editar</Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setEditing(o)}>Editar</Button>
+                      <Button size="sm" variant="ghost" title="Baixar PDF do pedido" onClick={() => downloadOrderPDF(o)}>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" title="Baixar CSV do pedido" onClick={() => downloadOrderCSV(o)}>
+                        <FileDown className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
             </TableBody>
           </Table>
         </CardContent>
