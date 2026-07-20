@@ -165,6 +165,25 @@ function PecasPage() {
               <Download className="h-4 w-4 mr-2" />
               Exportar CSV
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                downloadTablePDF({
+                  title: "Peças necessárias",
+                  subtitle: `${filtered.length} peça(s) no filtro`,
+                  filename: `pecas-${Date.now()}.pdf`,
+                  head: ["Job", "Peça", "Descrição", "Ped.", "Plan.", "Env.", "Falt.", "Resultado", "Data", "Status"],
+                  body: filtered.map((p) => [
+                    p.jobId, p.partId, p.description, p.requestedQuantity, p.plannedQuantity,
+                    p.shippedQuantity, p.missingQuantity, p.reconciliationResult, p.analysisDate, p.status,
+                  ]),
+                })
+              }
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
           </div>
         </CardContent>
       </Card>
