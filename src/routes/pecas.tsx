@@ -232,6 +232,16 @@ function PecasPage() {
                   <TableCell><StatusBadge result={p.reconciliationResult} /></TableCell>
                   <TableCell>{p.analysisDate}</TableCell>
                   <TableCell>{p.status}</TableCell>
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-end gap-1">
+                      <Button size="sm" variant="ghost" title="Baixar PDF" onClick={() => downloadPartPDF(p)}>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" title="Baixar CSV" onClick={() => downloadPartCSV(p)}>
+                        <FileDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
