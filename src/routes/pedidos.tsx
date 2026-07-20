@@ -48,6 +48,8 @@ import {
 } from "@/lib/api.functions";
 import type { Order, OrderOrigin, OrderStatus } from "@/lib/types";
 import { toast } from "sonner";
+import { downloadOrderCSV, downloadOrderPDF, downloadTablePDF, downloadCSV } from "@/lib/exporters";
+import { FileDown, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/pedidos")({
   head: () => ({ meta: [{ title: "Pedidos — Smart Material" }] }),
@@ -238,7 +240,15 @@ function PedidosPage() {
                   <TableCell>{o.expectedDeliveryDate || "—"}</TableCell>
                   <TableCell>{o.responsible || "—"}</TableCell>
                   <TableCell>
-                    <Button size="sm" variant="outline" onClick={() => setEditing(o)}>Editar</Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setEditing(o)}>Editar</Button>
+                      <Button size="sm" variant="ghost" title="Baixar PDF do pedido" onClick={() => downloadOrderPDF(o)}>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" title="Baixar CSV do pedido" onClick={() => downloadOrderCSV(o)}>
+                        <FileDown className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -246,6 +256,46 @@ function PedidosPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          onClick={() =>
+            downloadCSV(
+              `pedidos-${Date.now()}.csv`,
+              [
+                "ID Pedido","ID Trabalho","ID Peça","Descrição","Qtd Faltante",
+                "Origem","Status","Data Pedido","Prev. Entrega","Fornecedor","Responsável","Observações",
+              ],
+              filtered.map((o) => [
+                o.orderId, o.jobId, o.partId, o.description, o.missingQuantity,
+                o.origin, o.orderStatus, o.orderDate || "", o.expectedDeliveryDate || "",
+                o.supplier || "", o.responsible || "", o.notes || "",
+              ]),
+            )
+          }
+        >
+          <FileDown className="h-4 w-4 mr-2" /> Exportar CSV (lista)
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() =>
+            downloadTablePDF({
+              title: "Pedidos de compra",
+              subtitle: `Lista filtrada • ${filtered.length} pedido(s)`,
+              filename: `pedidos-${Date.now()}.pdf`,
+              head: ["Pedido", "Job", "Peça", "Descrição", "Falt.", "Origem", "Status", "Fornecedor", "Prev. Entrega"],
+              body: filtered.map((o) => [
+                o.orderId, o.jobId, o.partId, o.description, o.missingQuantity,
+                o.origin, o.orderStatus, o.supplier || "—", o.expectedDeliveryDate || "—",
+              ]),
+              accent: [34, 160, 107],
+            })
+          }
+        >
+          <FileText className="h-4 w-4 mr-2" /> Exportar PDF (lista)
+        </Button>
+      </div>
 
       <EditOrderSheet
         order={editing}

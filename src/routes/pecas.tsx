@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/sheet";
 import { getDashboardData } from "@/lib/api.functions";
 import type { NecessaryPart } from "@/lib/types";
-import { Download } from "lucide-react";
+import { Download, FileDown, FileText } from "lucide-react";
+import { downloadPartCSV, downloadPartPDF, downloadTablePDF } from "@/lib/exporters";
 
 export const Route = createFileRoute("/pecas")({
   head: () => ({ meta: [{ title: "Peças necessárias — Smart Material" }] }),
@@ -164,6 +165,25 @@ function PecasPage() {
               <Download className="h-4 w-4 mr-2" />
               Exportar CSV
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                downloadTablePDF({
+                  title: "Peças necessárias",
+                  subtitle: `${filtered.length} peça(s) no filtro`,
+                  filename: `pecas-${Date.now()}.pdf`,
+                  head: ["Job", "Peça", "Descrição", "Ped.", "Plan.", "Env.", "Falt.", "Resultado", "Data", "Status"],
+                  body: filtered.map((p) => [
+                    p.jobId, p.partId, p.description, p.requestedQuantity, p.plannedQuantity,
+                    p.shippedQuantity, p.missingQuantity, p.reconciliationResult, p.analysisDate, p.status,
+                  ]),
+                })
+              }
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -183,12 +203,13 @@ function PecasPage() {
                 <TableHead>Resultado</TableHead>
                 <TableHead>Data Análise</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
                     Nenhuma peça encontrada.
                   </TableCell>
                 </TableRow>
@@ -211,6 +232,16 @@ function PecasPage() {
                   <TableCell><StatusBadge result={p.reconciliationResult} /></TableCell>
                   <TableCell>{p.analysisDate}</TableCell>
                   <TableCell>{p.status}</TableCell>
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-end gap-1">
+                      <Button size="sm" variant="ghost" title="Baixar PDF" onClick={() => downloadPartPDF(p)}>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" title="Baixar CSV" onClick={() => downloadPartCSV(p)}>
+                        <FileDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -244,6 +275,14 @@ function PecasPage() {
                   <span className="font-medium text-right">{String(v)}</span>
                 </div>
               ))}
+              <div className="flex gap-2 pt-2">
+                <Button size="sm" onClick={() => downloadPartPDF(selected)}>
+                  <FileText className="h-4 w-4 mr-2" /> Baixar PDF
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => downloadPartCSV(selected)}>
+                  <FileDown className="h-4 w-4 mr-2" /> Baixar CSV
+                </Button>
+              </div>
             </div>
           )}
         </SheetContent>
