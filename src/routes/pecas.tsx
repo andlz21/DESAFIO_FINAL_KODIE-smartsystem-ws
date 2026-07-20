@@ -203,12 +203,13 @@ function PecasPage() {
                 <TableHead>Resultado</TableHead>
                 <TableHead>Data Análise</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
                     Nenhuma peça encontrada.
                   </TableCell>
                 </TableRow>
