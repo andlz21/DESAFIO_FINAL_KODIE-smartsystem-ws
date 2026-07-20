@@ -4,7 +4,7 @@
 Sistema para conciliação inteligente de materiais de desenhos técnicos
 industriais utilizando IA.
 
-**Aplicação:** [[https://smartsystem-ws.lovable.app](https://smartsystem-ws.lovable.app)/]
+**Aplicação:** [https://smartsystem-ws.lovable.app](https://smartsystem-ws.lovable.app)
 
 ## Objetivo
 
