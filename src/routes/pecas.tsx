@@ -24,7 +24,9 @@ import {
 } from "@/components/ui/sheet";
 import { getDashboardData } from "@/lib/api.functions";
 import type { NecessaryPart } from "@/lib/types";
-import { Download } from "lucide-react";
+import { Download, FileDown, FileText } from "lucide-react";
+import { downloadPartCSV, downloadPartPDF, downloadTablePDF } from "@/lib/exporters";
+import { Button as UIButton } from "@/components/ui/button";
 
 export const Route = createFileRoute("/pecas")({
   head: () => ({ meta: [{ title: "Peças necessárias — Smart Material" }] }),
