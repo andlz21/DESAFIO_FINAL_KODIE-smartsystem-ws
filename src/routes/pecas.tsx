@@ -275,6 +275,14 @@ function PecasPage() {
                   <span className="font-medium text-right">{String(v)}</span>
                 </div>
               ))}
+              <div className="flex gap-2 pt-2">
+                <Button size="sm" onClick={() => downloadPartPDF(selected)}>
+                  <FileText className="h-4 w-4 mr-2" /> Baixar PDF
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => downloadPartCSV(selected)}>
+                  <FileDown className="h-4 w-4 mr-2" /> Baixar CSV
+                </Button>
+              </div>
             </div>
           )}
         </SheetContent>
