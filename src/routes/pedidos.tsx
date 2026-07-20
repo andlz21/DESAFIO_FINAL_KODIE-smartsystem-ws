@@ -48,6 +48,8 @@ import {
 } from "@/lib/api.functions";
 import type { Order, OrderOrigin, OrderStatus } from "@/lib/types";
 import { toast } from "sonner";
+import { downloadOrderCSV, downloadOrderPDF, downloadTablePDF, downloadCSV } from "@/lib/exporters";
+import { FileDown, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/pedidos")({
   head: () => ({ meta: [{ title: "Pedidos — Smart Material" }] }),
