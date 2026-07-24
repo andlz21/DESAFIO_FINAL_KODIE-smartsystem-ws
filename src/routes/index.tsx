@@ -391,7 +391,12 @@ function Dashboard() {
             <Info className="h-4 w-4" aria-hidden />
             <AlertTitle>Modo demonstração</AlertTitle>
             <AlertDescription>
-              Nenhum webhook de leitura configurado. Exibindo dados de exemplo para navegação.
+              A variável de ambiente <code className="font-mono text-xs">SHEETS_READ_WEBHOOK</code>{" "}
+              ainda não foi configurada, então o dashboard está exibindo dados de exemplo.
+              Configure o webhook do Make.com em <Link to="/integracoes" className="underline">
+                Integrações
+              </Link>{" "}
+              para trocar por dados reais da planilha.
             </AlertDescription>
           </Alert>
         )}
