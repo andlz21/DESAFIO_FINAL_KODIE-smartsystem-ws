@@ -6,6 +6,7 @@ import {
   ShoppingCart,
   FileBarChart2,
   Plug,
+  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -25,6 +26,7 @@ const items = [
   { title: "Peças necessárias", url: "/pecas", icon: Package },
   { title: "Pedidos", url: "/pedidos", icon: ShoppingCart },
   { title: "Relatórios", url: "/relatorios", icon: FileBarChart2 },
+  { title: "Histórico", url: "/historico", icon: History },
   { title: "Integrações", url: "/integracoes", icon: Plug },
 ];
 
