@@ -15,6 +15,7 @@ import { Route as PedidosRouteImport } from './routes/pedidos'
 import { Route as PecasRouteImport } from './routes/pecas'
 import { Route as IntegracoesRouteImport } from './routes/integracoes'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicUploadDrawingRouteImport } from './routes/api/public/upload-drawing'
 
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
@@ -46,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicUploadDrawingRoute = ApiPublicUploadDrawingRouteImport.update({
+  id: '/api/public/upload-drawing',
+  path: '/api/public/upload-drawing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/pedidos': typeof PedidosRoute
   '/relatorios': typeof RelatoriosRoute
   '/upload': typeof UploadRoute
+  '/api/public/upload-drawing': typeof ApiPublicUploadDrawingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/pedidos': typeof PedidosRoute
   '/relatorios': typeof RelatoriosRoute
   '/upload': typeof UploadRoute
+  '/api/public/upload-drawing': typeof ApiPublicUploadDrawingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/pedidos': typeof PedidosRoute
   '/relatorios': typeof RelatoriosRoute
   '/upload': typeof UploadRoute
+  '/api/public/upload-drawing': typeof ApiPublicUploadDrawingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,8 +90,16 @@ export interface FileRouteTypes {
     | '/pedidos'
     | '/relatorios'
     | '/upload'
+    | '/api/public/upload-drawing'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/integracoes' | '/pecas' | '/pedidos' | '/relatorios' | '/upload'
+  to:
+    | '/'
+    | '/integracoes'
+    | '/pecas'
+    | '/pedidos'
+    | '/relatorios'
+    | '/upload'
+    | '/api/public/upload-drawing'
   id:
     | '__root__'
     | '/'
@@ -91,6 +108,7 @@ export interface FileRouteTypes {
     | '/pedidos'
     | '/relatorios'
     | '/upload'
+    | '/api/public/upload-drawing'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +118,7 @@ export interface RootRouteChildren {
   PedidosRoute: typeof PedidosRoute
   RelatoriosRoute: typeof RelatoriosRoute
   UploadRoute: typeof UploadRoute
+  ApiPublicUploadDrawingRoute: typeof ApiPublicUploadDrawingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -146,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/upload-drawing': {
+      id: '/api/public/upload-drawing'
+      path: '/api/public/upload-drawing'
+      fullPath: '/api/public/upload-drawing'
+      preLoaderRoute: typeof ApiPublicUploadDrawingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -156,17 +182,8 @@ const rootRouteChildren: RootRouteChildren = {
   PedidosRoute: PedidosRoute,
   RelatoriosRoute: RelatoriosRoute,
   UploadRoute: UploadRoute,
+  ApiPublicUploadDrawingRoute: ApiPublicUploadDrawingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
