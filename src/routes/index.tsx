@@ -136,12 +136,33 @@ function orderBadge(status: string) {
 }
 
 function Dashboard() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => getDashboardData(),
     refetchInterval: 30_000,
   });
   const [jobFilter, setJobFilter] = useState<string>("all");
+
+  const handleSaveSnapshot = () => {
+    if (!data) return;
+    const snap = saveSnapshot(data, orders, `Snapshot manual — filtro: ${jobFilter}`);
+    toast.success("Snapshot salvo no histórico", {
+      description: new Date(snap.createdAt).toLocaleString("pt-BR"),
+      action: { label: "Ver histórico", onClick: () => navigate({ to: "/historico" }) },
+    });
+  };
+
+  const handleReset = () => {
+    if (data) saveSnapshot(data, orders, "Snapshot automático antes de resetar");
+    clearLocalDashboardData();
+    setJobFilter("all");
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    toast.success("Dashboard resetado", {
+      description: "Alterações locais removidas. Versão anterior salva no histórico.",
+    });
+  };
 
   const parts: NecessaryPart[] = data?.necessaryParts ?? [];
   const orders: Order[] = useMemo(() => (data ? applyOverrides(data.orders) : []), [data]);
