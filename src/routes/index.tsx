@@ -55,6 +55,8 @@ import {
   ArrowRight,
   Info,
   Activity,
+  Save,
+  RotateCcw,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
