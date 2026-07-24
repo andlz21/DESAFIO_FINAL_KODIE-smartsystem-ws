@@ -36,9 +36,9 @@ const STATES: Record<State, { label: string; icon: React.ComponentType<{ classNa
 };
 
 const MAX_MB = 25;
-const WEBHOOK =
-  import.meta.env.VITE_PDF_UPLOAD_WEBHOOK ||
-  "https://hook.us2.make.com/uadq8mop2a0u9ppadoylrolfpo7o78t3";
+// Upload é enviado ao proxy interno (server route) que encaminha ao webhook
+// do Make.com. O URL do webhook nunca é exposto no bundle do cliente.
+const UPLOAD_ENDPOINT = "/api/public/upload-drawing";
 
 function UploadPage() {
   const qc = useQueryClient();
@@ -94,7 +94,7 @@ function UploadPage() {
 
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", WEBHOOK);
+        xhr.open("POST", UPLOAD_ENDPOINT);
         // Não definir Content-Type manualmente — o browser gera multipart/form-data com boundary.
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
