@@ -308,38 +308,67 @@ function Dashboard() {
               Acompanhe o status das peças analisadas, faltantes e pedidos em andamento.
             </p>
           </div>
-          <div
-            role="tablist"
-            aria-label="Filtrar por trabalho"
-            className="flex flex-wrap gap-1 rounded-md border bg-card p-1"
-          >
-            <button
-              role="tab"
-              aria-selected={jobFilter === "all"}
-              onClick={() => setJobFilter("all")}
-              className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
-                jobFilter === "all"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleSaveSnapshot} disabled={!data}>
+              <Save className="h-4 w-4 mr-1" aria-hidden />
+              Salvar snapshot
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" disabled={!data}>
+                  <RotateCcw className="h-4 w-4 mr-1" aria-hidden />
+                  Resetar dashboard
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Resetar o dashboard?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Um snapshot da versão atual será salvo automaticamente no{" "}
+                    <b>Histórico</b>. Em seguida, todas as alterações locais (pedidos criados
+                    manualmente e edições) serão descartadas e os dados serão recarregados da
+                    fonte.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset}>Resetar</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <div
+              role="tablist"
+              aria-label="Filtrar por trabalho"
+              className="flex flex-wrap gap-1 rounded-md border bg-card p-1"
             >
-              Todos os trabalhos
-            </button>
-            {jobsList.map((j) => (
               <button
-                key={j}
                 role="tab"
-                aria-selected={jobFilter === j}
-                onClick={() => setJobFilter(j)}
+                aria-selected={jobFilter === "all"}
+                onClick={() => setJobFilter("all")}
                 className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
-                  jobFilter === j
+                  jobFilter === "all"
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted"
                 }`}
               >
-                {j}
+                Todos os trabalhos
               </button>
-            ))}
+              {jobsList.map((j) => (
+                <button
+                  key={j}
+                  role="tab"
+                  aria-selected={jobFilter === j}
+                  onClick={() => setJobFilter(j)}
+                  className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
+                    jobFilter === j
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {j}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
