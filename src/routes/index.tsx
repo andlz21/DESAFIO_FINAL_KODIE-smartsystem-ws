@@ -1,6 +1,22 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  clearLocalDashboardData,
+  saveSnapshot,
+} from "@/lib/history";
 import {
   BarChart,
   Bar,
@@ -39,6 +55,8 @@ import {
   ArrowRight,
   Info,
   Activity,
+  Save,
+  RotateCcw,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -118,12 +136,33 @@ function orderBadge(status: string) {
 }
 
 function Dashboard() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => getDashboardData(),
     refetchInterval: 30_000,
   });
   const [jobFilter, setJobFilter] = useState<string>("all");
+
+  const handleSaveSnapshot = () => {
+    if (!data) return;
+    const snap = saveSnapshot(data, orders, `Snapshot manual — filtro: ${jobFilter}`);
+    toast.success("Snapshot salvo no histórico", {
+      description: new Date(snap.createdAt).toLocaleString("pt-BR"),
+      action: { label: "Ver histórico", onClick: () => navigate({ to: "/historico" }) },
+    });
+  };
+
+  const handleReset = () => {
+    if (data) saveSnapshot(data, orders, "Snapshot automático antes de resetar");
+    clearLocalDashboardData();
+    setJobFilter("all");
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    toast.success("Dashboard resetado", {
+      description: "Alterações locais removidas. Versão anterior salva no histórico.",
+    });
+  };
 
   const parts: NecessaryPart[] = data?.necessaryParts ?? [];
   const orders: Order[] = useMemo(() => (data ? applyOverrides(data.orders) : []), [data]);
@@ -269,38 +308,67 @@ function Dashboard() {
               Acompanhe o status das peças analisadas, faltantes e pedidos em andamento.
             </p>
           </div>
-          <div
-            role="tablist"
-            aria-label="Filtrar por trabalho"
-            className="flex flex-wrap gap-1 rounded-md border bg-card p-1"
-          >
-            <button
-              role="tab"
-              aria-selected={jobFilter === "all"}
-              onClick={() => setJobFilter("all")}
-              className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
-                jobFilter === "all"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleSaveSnapshot} disabled={!data}>
+              <Save className="h-4 w-4 mr-1" aria-hidden />
+              Salvar snapshot
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" disabled={!data}>
+                  <RotateCcw className="h-4 w-4 mr-1" aria-hidden />
+                  Resetar dashboard
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Resetar o dashboard?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Um snapshot da versão atual será salvo automaticamente no{" "}
+                    <b>Histórico</b>. Em seguida, todas as alterações locais (pedidos criados
+                    manualmente e edições) serão descartadas e os dados serão recarregados da
+                    fonte.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset}>Resetar</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <div
+              role="tablist"
+              aria-label="Filtrar por trabalho"
+              className="flex flex-wrap gap-1 rounded-md border bg-card p-1"
             >
-              Todos os trabalhos
-            </button>
-            {jobsList.map((j) => (
               <button
-                key={j}
                 role="tab"
-                aria-selected={jobFilter === j}
-                onClick={() => setJobFilter(j)}
+                aria-selected={jobFilter === "all"}
+                onClick={() => setJobFilter("all")}
                 className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
-                  jobFilter === j
+                  jobFilter === "all"
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted"
                 }`}
               >
-                {j}
+                Todos os trabalhos
               </button>
-            ))}
+              {jobsList.map((j) => (
+                <button
+                  key={j}
+                  role="tab"
+                  aria-selected={jobFilter === j}
+                  onClick={() => setJobFilter(j)}
+                  className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
+                    jobFilter === j
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {j}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -323,7 +391,12 @@ function Dashboard() {
             <Info className="h-4 w-4" aria-hidden />
             <AlertTitle>Modo demonstração</AlertTitle>
             <AlertDescription>
-              Nenhum webhook de leitura configurado. Exibindo dados de exemplo para navegação.
+              A variável de ambiente <code className="font-mono text-xs">SHEETS_READ_WEBHOOK</code>{" "}
+              ainda não foi configurada, então o dashboard está exibindo dados de exemplo.
+              Configure o webhook do Make.com em <Link to="/integracoes" className="underline">
+                Integrações
+              </Link>{" "}
+              para trocar por dados reais da planilha.
             </AlertDescription>
           </Alert>
         )}
