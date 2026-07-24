@@ -94,7 +94,7 @@ function UploadPage() {
 
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", WEBHOOK);
+        xhr.open("POST", UPLOAD_ENDPOINT);
         // Não definir Content-Type manualmente — o browser gera multipart/form-data com boundary.
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
